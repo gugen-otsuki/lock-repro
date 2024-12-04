@@ -31,7 +31,9 @@ internal class Program
             Console.WriteLine("Exiting...");
         };
 
-        await SendTimestampMessagesToIoTHubAsync(deviceClient, cts.Token);
+        var sendTask = SendTimestampMessagesToIoTHubAsync(deviceClient, cts.Token);
+        var receiveTask = ReceiveMessagesFromIoTHubAsync(deviceClient, cts.Token);
+        await Task.WhenAll(sendTask, receiveTask);
 
         await deviceClient.CloseAsync();
         Console.WriteLine("Message sender finished.");
@@ -65,6 +67,34 @@ internal class Program
         catch (TaskCanceledException)
         {
             Console.WriteLine("Message sending canceled.");
+        }
+    }
+
+
+    private static async Task ReceiveMessagesFromIoTHubAsync(DeviceClient deviceClient, CancellationToken ct)
+    {
+        Console.WriteLine("Listening for incoming messages...");
+
+        try
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                var receivedMessage = await deviceClient.ReceiveAsync(TimeSpan.FromSeconds(1));
+                if (receivedMessage == null)
+                {
+                    continue;
+                }
+
+                string messageBody = Encoding.UTF8.GetString(receivedMessage.GetBytes());
+                Console.WriteLine($"{DateTime.Now} > Received message: {messageBody}");
+
+                // Acknowledge the message
+                await deviceClient.CompleteAsync(receivedMessage, ct);
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            Console.WriteLine("Message receiving canceled.");
         }
     }
 }

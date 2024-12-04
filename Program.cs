@@ -9,7 +9,7 @@ namespace IoTHubMessageSender;
 
 internal class Program
 {
-    private static readonly TimeSpan MessageInterval = TimeSpan.FromSeconds(10); // Hardcoded interval
+    private static readonly TimeSpan MessageInterval = TimeSpan.FromSeconds(1); // Hardcoded interval
 
     private static async Task<int> Main(string[] args)
     {

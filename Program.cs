@@ -13,6 +13,7 @@ internal class Program
 
     private static async Task<int> Main(string[] args)
     {
+        DeviceSimulator
         // Retrieve the connection string from environment variable
         string deviceConnectionString = Environment.GetEnvironmentVariable("IOTHUB_DEVICE_CONNECTION_STRING");
         if (string.IsNullOrEmpty(deviceConnectionString))
